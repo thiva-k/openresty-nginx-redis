@@ -1,3 +1,4 @@
+version: '3'
 
 services:
 
@@ -18,7 +19,7 @@ services:
     depends_on:
       - server1
       - server2
-      - redis
+      - mysql
 
   load_balancer2:
     build:
@@ -28,7 +29,7 @@ services:
     depends_on:
       - server3
       - server4
-      - redis
+      - mysql
 
   server1:
     build:
@@ -48,19 +49,23 @@ services:
     ports:
       - "8084:8080"
     depends_on:
-      - redis
+      - mysql
 
   server4:
-      build:
-        context: ./nginx_server4
-      ports:
-        - "8085:8080"
-      depends_on:
-        - redis
-
-  redis:
-    image: redis/redis-stack:latest
+    build:
+      context: ./nginx_server4
     ports:
-      - "6379:6379"
-      - "8001:8001"
+      - "8085:8080"
+    depends_on:
+      - mysql
 
+  mysql:
+    image: mysql:latest
+    command: --mysql-native-password=ON
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: rate_limits
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"

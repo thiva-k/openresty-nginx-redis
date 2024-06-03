@@ -1,5 +1,8 @@
 FROM openresty/openresty:alpine
 
+# Install MySQL client library for Lua
+RUN apk --no-cache add mysql-client
+
 # Create a directory to store Lua scripts
 RUN mkdir -p /usr/local/openresty/nginx/lua_scripts
 
